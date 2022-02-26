@@ -1,0 +1,19 @@
+[
+  {
+    "userToUse": "root",
+    "databaseToUse": "postgres",
+    "dependencies": [],
+    "fileList": [
+      "..//postgres/release/0.0.0.0/schema/00-database-setup/0-stop-connections.sql",
+      "..//postgres/release/0.0.0.0/schema/00-database-setup/0-drop-database.sql",
+      "..//postgres/release/0.0.0.0/schema/00-database-setup/00-create-database.sql"
+    ]
+  },
+  {
+    "userToUse": "root",
+    "dependencies": [],
+    "fileList": [
+      "..//postgres/release/0.0.0.0/schema/00-database-setup/01-timezone.sql"
+    ]
+  }
+]
