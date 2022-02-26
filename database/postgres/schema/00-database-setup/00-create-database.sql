@@ -1,0 +1,1 @@
+CREATE DATABASE <env>_dts;
