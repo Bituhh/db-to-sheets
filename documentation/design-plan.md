@@ -101,8 +101,8 @@
   - \#connect(ssmParameter: string);
   - call(storedProcedureName: string);
 
-- SSM:
-  - getParameter()
+- SecretManager:
+  - getSecret()
 
 - Spreadsheet:
   - \#connect(ssmParameter: string)
