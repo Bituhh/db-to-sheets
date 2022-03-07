@@ -1,0 +1,12 @@
+[
+    {
+        "userToUse": "root",
+        "dependencies": [],
+        "fileList": [
+            "..//postgres/release/current/schema/03-tables/dtst_report_rep.sql",
+            "..//postgres/release/current/schema/10-users-roles-permissions/app_user_dts.sql",
+            "..//postgres/release/current/schema/07-functions/dtsf_get_report.sql",
+            "..//postgres/release/current/schema/07-functions/dtsf_example_report.sql"
+        ]
+    }
+]
