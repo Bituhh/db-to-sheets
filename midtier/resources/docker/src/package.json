@@ -9,10 +9,18 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "jest": "^27.5.1"
+    "jest": "^27.5.1",
+    "jest-extended": "^2.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.53.1",
     "@aws-sdk/client-secrets-manager": "^3.52.0",
+    "@googleapis/sheets": "^0.3.0",
     "pg": "^8.7.3"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./testSetup.js"
+    ]
   }
 }

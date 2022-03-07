@@ -1,6 +1,5 @@
 const {Database} = require('./index');
-const {DatabaseEngine} = require('./database-engine.enum');
-const stage = process.env.stage ?? 'dev';
+const {DatabaseEngine} = require('../enums/database-engine.enum');
 const pg = require('pg');
 jest.mock('pg');
 
@@ -8,13 +7,23 @@ const {Validate} = require('../helpers/validator');
 jest.mock('../helpers/validator');
 
 const {Random} = require('../helpers/random');
-const {data} = require('aws-cdk/lib/logging');
-
 const pgClient = pg.Client;
+const stage = process.env.stage ?? 'dev';
 
 describe('Database', () => {
+  let connectSpy;
+  let querySpy;
+  let endSpy;
   beforeEach(() => {
     pgClient.mockReset();
+    connectSpy = jest.fn().mockReturnValue(Promise.resolve());
+    querySpy = jest.fn().mockReturnValue(Promise.resolve({rows: [Random.object()]}));
+    endSpy = jest.fn().mockReturnValue(Promise.resolve());
+    pg.Client.mockImplementation(() => ({
+      connect: connectSpy,
+      query: querySpy,
+      end: endSpy,
+    }));
   });
 
   it('should exist', () => {
@@ -135,8 +144,7 @@ describe('Database', () => {
 
     it('should return value from callPostgres', async () => {
       const expected = [{name: 'string'}];
-      const spy = jest.spyOn(database, 'callPostgres')
-        .mockReturnValue(expected);
+      jest.spyOn(database, 'callPostgres').mockReturnValue(expected);
 
       database.config.engine = DatabaseEngine.postgres;
       const result = await database.storedProcedure('stored_procedure', {});
@@ -208,19 +216,20 @@ describe('Database', () => {
         port: database.config.port,
         user: database.config.username,
         password: database.config.password,
+        database: database.config.dbname,
       });
     });
 
     it('should call client.connect', async () => {
       await database.callPostgres('stored_procedure', {});
 
-      expect(pgClient.prototype.connect).toHaveBeenCalled();
+      expect(connectSpy).toHaveBeenCalled();
     });
 
     it('should call client.query', async () => {
       await database.callPostgres('stored_procedure', {});
 
-      expect(pgClient.prototype.query).toHaveBeenCalled();
+      expect(querySpy).toHaveBeenCalled();
     });
 
     it('should call client.query with correct stored procedure', async () => {
@@ -228,7 +237,7 @@ describe('Database', () => {
       const args = {};
       await database.callPostgres(storedProcedureName, args);
 
-      expect(pgClient.prototype.query)
+      expect(querySpy)
         .toHaveBeenCalledWith(`SELECT * FROM ${storedProcedureName}()`, []);
     });
 
@@ -237,7 +246,7 @@ describe('Database', () => {
       const args = {reportId: 1, reportName: 'report'};
       await database.callPostgres(storedProcedureName, args);
 
-      expect(pgClient.prototype.query)
+      await expect(querySpy)
         .toHaveBeenCalledWith(
           `SELECT * FROM ${storedProcedureName}($1, $2)`,
           [1, 'report'],
@@ -249,7 +258,7 @@ describe('Database', () => {
       const args = {reportName: Random.alphanumeric()};
       await database.callPostgres(storedProcedureName, args);
 
-      expect(pgClient.prototype.query)
+      expect(querySpy)
         .toHaveBeenCalledWith(
           `SELECT * FROM ${storedProcedureName}($1)`,
           [args.reportName],
@@ -261,7 +270,7 @@ describe('Database', () => {
       const args = {[Random.alphanumeric()]: Random.alphanumeric()};
       await database.callPostgres(storedProcedureName, args);
 
-      expect(pgClient.prototype.query)
+      expect(querySpy)
         .toHaveBeenCalledWith(
           `SELECT * FROM ${storedProcedureName}($1)`,
           [Object.values(args)[0]],
@@ -281,25 +290,69 @@ describe('Database', () => {
       const argsString = arrayArgs.reduce((p, c, i) => i === 0
         ? `$${i + 1}`
         : `${p}, $${i + 1}`, null);
-      expect(pgClient.prototype.query)
+      expect(querySpy)
         .toHaveBeenCalledWith(
           `SELECT * FROM ${storedProcedureName}(${argsString})`,
           Object.values(args),
         );
     });
 
-    it('should return result from  client.query', async () => {
-      const expected = [
-        {id: 1, name: 'Report 1'},
-        {id: 1, name: 'Report 1'},
-      ];
-      pgClient.prototype.query.mockImplementation(() => expected);
+    it('should call client.end after client.query', async () => {
+      const args = {[Random.alphanumeric()]: Random.alphanumeric()};
+      await database.callPostgres('stored_procedure', args);
+
+      expect(endSpy).toHaveBeenCalledAfter(querySpy);
+    });
+
+    it('should return data when object has functionName as key on the first element of the array', async () => {
+      const functionName = Random.alphanumeric();
+      const rowsLength = Random.number(10);
+      const rows = [];
+      for (let i = 0; i < rowsLength; i++) {
+        rows[i] = {[functionName]: Random.object()};
+      }
+      const expected = {rows};
+      querySpy.mockReturnValue(Promise.resolve(expected));
 
       const args = {[Random.alphanumeric()]: Random.alphanumeric()};
-      const returned = await database.callPostgres('stored_procedure', args);
+      const result = await database.callPostgres(functionName, args);
 
-      expect(returned).toEqual(expected);
-      expect(returned).toBe(expected);
+      expect(result).toEqual(expected.rows[0][functionName]);
+      expect(result).toBe(expected.rows[0][functionName]);
+    });
+
+    it('should return data when object has functionName as key on the first element of the array if value is null', async () => {
+      const functionName = Random.alphanumeric();
+      const rowsLength = Random.number(10);
+      const rows = [];
+      for (let i = 0; i < rowsLength; i++) {
+        rows[i] = {[functionName]: null};
+      }
+      const expected = {rows};
+      querySpy.mockReturnValue(Promise.resolve(expected));
+
+      const args = {[Random.alphanumeric()]: Random.alphanumeric()};
+      const result = await database.callPostgres(functionName, args);
+
+      expect(result).toEqual(expected.rows[0][functionName]);
+      expect(result).toBe(expected.rows[0][functionName]);
+    });
+
+    it('should return data from rows', async () => {
+      const functionName = Random.alphanumeric();
+      const rowsLength = Random.number(10);
+      const rows = [];
+      for (let i = 0; i < rowsLength; i++) {
+        rows[i] = Random.object();
+      }
+      const expected = {rows};
+      querySpy.mockReturnValue(Promise.resolve(expected));
+
+      const args = {[Random.alphanumeric()]: Random.alphanumeric()};
+      const result = await database.callPostgres(functionName, args);
+
+      expect(result).toEqual(expected.rows);
+      expect(result).toBe(expected.rows);
     });
   });
 });

@@ -1,4 +1,4 @@
-const {DatabaseEngine} = require('./database-engine.enum');
+const {DatabaseEngine} = require('../enums/database-engine.enum');
 
 class DatabaseConfig {
   /**
