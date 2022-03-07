@@ -1,4 +1,4 @@
-const {DatabaseEngine} = require('./database-engine.enum');
+const {DatabaseEngine} = require('../enums/database-engine.enum');
 const pg = require('pg');
 const {Validate} = require('../helpers/validator');
 
@@ -47,11 +47,21 @@ class Database {
       port: this.config.port,
       user: this.config.username,
       password: this.config.password,
+      database: this.config.dbname,
     });
     await client.connect();
     const argsValues = Object.values(args);
     const argsList = argsValues.map((v, i) => `$${i + 1}`).join(', ');
-    return await client.query(`SELECT * FROM ${name}(${argsList})`, argsValues);
+    return await client.query(`SELECT * FROM ${name}(${argsList})`, argsValues)
+      .then(data => {
+        if (data.rows[0].hasOwnProperty(name)) {
+          return data.rows[0][name];
+        }
+        return data.rows;
+      })
+      .finally(() => {
+        client.end();
+      });
   }
 
   async callMysql() {
