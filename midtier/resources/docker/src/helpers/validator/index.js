@@ -33,7 +33,7 @@ class Validate {
 
   static #type(value, type, name) {
     if (typeof value !== type || value === null) {
-      throw new Error(`Argument '${name}' is not a ${type}!`);
+      throw new Error(`Argument '${name}' is not a ${type}!\nInstead received ${typeof value} as ${JSON.stringify(value)}.`);
     }
   }
 }
