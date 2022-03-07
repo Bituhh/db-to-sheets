@@ -2,7 +2,7 @@ const {
   SecretsManagerClient,
   GetSecretValueCommand,
 } = require('@aws-sdk/client-secrets-manager');
-const {DatabaseConfig} = require('../database/database-config.model');
+const {DatabaseConfig} = require('../models/database-config.model');
 const secretsManagerClient = new SecretsManagerClient({});
 const stage = process.env.stage ?? 'dev';
 
