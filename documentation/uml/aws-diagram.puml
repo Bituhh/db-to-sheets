@@ -1,0 +1,39 @@
+@startuml
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+
+!includeurl AWSPuml/AWSCommon.puml
+'!includeurl AWSPuml/AWSSimplified.puml
+!includeurl AWSPuml/Compute/Lambda.puml
+!includeurl AWSPuml/Containers/ElasticContainerServiceTask.puml
+!includeurl AWSPuml/Containers/Fargate.puml
+!includeurl AWSPuml/Containers/ElasticContainerServiceContainer1.puml
+!includeurl AWSPuml/ApplicationIntegration/EventBridgeRule.puml
+!includeurl AWSPuml/ApplicationIntegration/APIGateway.puml
+
+
+rectangle "API created\nRan externally via UI to ensure full implementation" <<Stage 4>> {
+  APIGateway(API, API, Triggered by the user)
+  rectangle "Lambda and Report Manager created\nRan via AWS console to ensure functionality" <<Stage 3>> {
+    Lambda(Lambda, Lambda, CRUD for reports)
+    EventBridgeRule(EventBridgeRule, EventBridge Rule, Sets frequency for the service to run)
+    rectangle "ECS Services fully created\nRan via AWS console to ensure functionality" <<Stage 2>>{
+      rectangle "Scheduled Event" as Event #line.dashed {
+        Fargate(Fargate, Fargate, Instance that will execute the container)
+        ElasticContainerServiceTask(ECSTaskDefinition, ECS TaskDefinition, Defines the system information and docker details)
+        rectangle "Container Built and Ran locally" <<Stage 1>> {
+          ElasticContainerServiceContainer1(Containers, Docker Container, Defines the code)
+        }
+      }
+    }
+  }
+}
+
+API -> Lambda
+Lambda -> EventBridgeRule
+EventBridgeRule --> Event: Schedule reports
+Event --> ECSTaskDefinition: Event triggered
+Lambda -> ECSTaskDefinition: Run report once
+ECSTaskDefinition --> Fargate
+Fargate -> Containers
+
+@enduml

@@ -1,0 +1,10 @@
+@startuml
+!include helpers.puml
+
+group DeleteReport
+  User -> Lambda: API Call
+  $RetrieveReport('single')
+  Lambda -> EventBridge: Delete rule
+  Lambda -> DB: Delete report data
+end
+@enduml

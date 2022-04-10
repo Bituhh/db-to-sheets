@@ -1,0 +1,14 @@
+@startuml
+!include helpers.puml
+
+group UpdateReport
+  User -> Lambda: API Call
+  $RetrieveReport('single')
+  alt Changes affect EventBridge Rule
+    Lambda -> EventBridge: Delete old rule
+    Lambda -> EventBridge: Create new rule
+    EventBridge -> Lambda: Rule Identifier
+  end
+  Lambda -> DB: Update changes
+end
+@enduml

@@ -1,0 +1,63 @@
+@startuml
+object DatabaseConfig {
+  username: string
+  engine: DatabaseEngine
+  host: string
+  port: number
+  dbname: string
+  password: string
+}
+
+class Database {
+  -config: DatabaseConfig
+  +process(name: string, args: {[key: string]: any}[])
+  -callPostgres(name: string, args: {[key: string]: any}[])
+  -callMysql(name: string, args: {[key: string]: any}[])
+}
+
+class SecretManager {
+  {static} +getSecret(secretId: string): DatabaseConfig
+}
+
+class Spreadsheet {
+  +writeDataToSpreadsheet()
+  -createCredentialsFile(path: string)
+  -authenticate(path: string)
+  -clearRange(spreadsheetId: string, range: string)
+  -updateRange(spreadsheetId: string, range: string, values: {[key: string]: *}[])
+  {static} -createCredentialsFile(path: string)
+  {static} -deleteCredentialsFile(path: string)
+}
+
+class DBToSheets {
+  +run(reportId: string)
+  +getReportDetails(id: number)
+  +getReportData(id: number)
+  -getDataFromDatabase(secretsManagerKey: string, storedProcedureName: string, args: {[key: string]: any}[])
+}
+
+class Validate {
+  {static} +string(arg: string, name: string);
+  {static} +number(arg: number, name: string);
+  {static} +object(arg: {[key: any]: any}, name: string);
+  {static} -arguments(args: any[], expected: number)
+  {static} -type(value: any, type: string, name: string)
+}
+
+circle Run
+
+
+Run --> DBToSheets
+
+DBToSheets ..> Database
+DatabaseConfig "*" --> "1" Database
+Database "*" ..> Validate
+
+DBToSheets ..> SecretManager
+SecretManager "*" ..> Validate
+
+DBToSheets ..> Spreadsheet
+Spreadsheet "*" ..> Validate
+
+DBToSheets "*" ..> Validate
+@enduml

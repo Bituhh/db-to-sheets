@@ -1,0 +1,11 @@
+@startuml
+!include helpers.puml
+
+group CreateReport
+  User -> Lambda: API Call
+  Lambda -> DB: Insert data
+  Lambda -> EventBridge: Create EventBridge Rule
+  EventBridge -> Lambda: Rule identifier
+  Lambda -> DB: Update rule identifier
+end
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+!include helpers.puml
+
+group GetReports
+  User -> Lambda: API Call
+  $RetrieveReport('both')
+  Lambda -> User: Data
+end
+@enduml

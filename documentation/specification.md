@@ -17,7 +17,7 @@ database user permissions, as previous setup is required outside the scope of th
 
 The purpose of tools is to allow the user to easily add new reports, and manage those reports. The user will only need
 to provide the remote DB access details, stored procedure name, time to schedule the report, and destination sheet and
-name once and the system will be able repeatedly report the information retrieved from the remote DB to the destination
+name once, and the system will be able repeatedly report the information retrieved from the remote DB to the destination
 sheet.
 
 ### Definitions & Acronyms

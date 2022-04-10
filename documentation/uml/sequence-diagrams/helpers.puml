@@ -1,0 +1,21 @@
+@startuml
+actor User
+participant Lambda
+database DB
+participant EventBridge
+
+!procedure $RetrieveReport($mode)
+  !if ($mode == 'single')
+    Lambda -> DB: Retrieve report
+  !else ($mode == 'multiple')
+    Lambda -> DB: Retrieve reports
+  !else
+    alt report id exist
+      Lambda -> DB: Retrieve single report
+    else report id doesn't exist
+      Lambda -> DB: Retrieve multiple report
+    end
+  !endif
+  DB -> Lambda: Report data
+!endprocedure
+@enduml
