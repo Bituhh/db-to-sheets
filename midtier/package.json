@@ -5,6 +5,7 @@
     "db-to-sheets": "bin/db-to-sheets.js"
   },
   "scripts": {
+    "deploy": "cdk synth && cdk deploy -v",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest --watch",

@@ -1,8 +1,8 @@
 const {SecretManager} = require('../secret-manager');
 const {Database} = require('../database');
-const {Validate} = require('../helpers/validator');
 const {ReportDetails} = require('../models/report-details.model');
 const {Spreadsheet} = require('../spreadsheet');
+const {Validate} = require('../helpers/validator');
 
 const stage = process.env.stage ?? 'dev';
 
@@ -69,7 +69,7 @@ class DBToSheets {
                                     args) {
     const config = await SecretManager.getSecret(secretsManagerKey);
     const database = new Database(config);
-    return await database.storedProcedure(storedProcedureName, args);
+    return await database.process(storedProcedureName, args);
   }
 }
 

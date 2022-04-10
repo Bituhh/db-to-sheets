@@ -168,7 +168,7 @@ describe('DBToSheets', () => {
     it('should call database.storedProcedure with correct stored procedure and args', async () => {
       await dbToSheets.getReportDetails(1);
 
-      expect(Database.prototype.storedProcedure)
+      expect(Database.prototype.process)
         .toHaveBeenCalledWith('dtsf_get_report', {id: 1});
     });
 
@@ -176,13 +176,13 @@ describe('DBToSheets', () => {
       const id = Random.number(100000);
       await dbToSheets.getReportDetails(id);
 
-      expect(Database.prototype.storedProcedure)
+      expect(Database.prototype.process)
         .toHaveBeenCalledWith('dtsf_get_report', {id});
     });
 
     it('should return data received from database.storedProcedure as ReportDetails object', async () => {
       const data = {[Random.alphanumeric()]: Random.alphanumeric()};
-      Database.prototype.storedProcedure.mockReturnValue(Promise.resolve(data));
+      Database.prototype.process.mockReturnValue(Promise.resolve(data));
 
       const response = await dbToSheets.getReportDetails(1);
 
@@ -191,7 +191,7 @@ describe('DBToSheets', () => {
     });
 
     it('should return null when the data received from database.storedProcedure is null', async () => {
-      Database.prototype.storedProcedure.mockReturnValue(Promise.resolve(null));
+      Database.prototype.process.mockReturnValue(Promise.resolve(null));
 
       const response = await dbToSheets.getReportDetails(1);
 
@@ -264,13 +264,13 @@ describe('DBToSheets', () => {
     it('should call database.storedProcedure with first argument as reportDetails.storedProcedureName and second as empty object', async () => {
       await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 
-      expect(Database.prototype.storedProcedure)
+      expect(Database.prototype.process)
         .toHaveBeenCalledWith(reportDetails.storedProcedureName, {});
     });
 
     it('should return data received from database.storedProcedure', async () => {
       const data = Random.table();
-      Database.prototype.storedProcedure.mockReturnValue(Promise.resolve(data));
+      Database.prototype.process.mockReturnValue(Promise.resolve(data));
 
       const response = await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 

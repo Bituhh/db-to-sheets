@@ -2,7 +2,7 @@ const {DatabaseEngine} = require('../enums/database-engine.enum');
 const pg = require('pg');
 const {Validate} = require('../helpers/validator');
 
-class Database {
+module.exports.Database = class {
 
   /**
    * @type {DatabaseConfig}
@@ -26,20 +26,20 @@ class Database {
    * @param {string} name
    * @param {{[key: string]: *}} args
    */
-  async process(name, args) {
+  async storedProcedure(name, args) {
     Validate.string(name, 'name');
     Validate.object(args, 'args');
     switch (this.config.engine) {
       case DatabaseEngine.postgres:
-        return await this.postgres(name, args);
+        return await this.callPostgres(name, args);
       case DatabaseEngine.mysql:
-        return await this.mysql(name, args);
+        return await this.callMysql(name, args);
       default:
         throw new Error('Unknown engine in connection configuration!');
     }
   }
 
-  async postgres(name, args) {
+  async callPostgres(name, args) {
     Validate.string(name, 'name');
     Validate.object(args, 'args');
     const client = new pg.Client({
@@ -64,9 +64,7 @@ class Database {
       });
   }
 
-  async mysql() {
+  async callMysql() {
     // TODO - After completion of initial data.
   }
-}
-
-module.exports = {Database};
+};

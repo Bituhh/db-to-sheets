@@ -1,13 +1,13 @@
 import * as cdk from 'aws-cdk-lib';
 import {Template} from 'aws-cdk-lib/assertions';
-import {DockerStack} from '../lib/docker.stack';
+import {DBToSheetsStack} from '../lib/db-to-sheets-stack';
 
-describe('Docker Stack', () => {
+describe('DB To Sheets Stack', () => {
   let template: cdk.assertions.Template;
 
   beforeEach(() => {
     const app = new cdk.App();
-    const stack = new DockerStack(app, 'DockerStack', {stage: 'testing'});
+    const stack = new DBToSheetsStack(app, 'DockerStack', {stage: 'testing'});
     template = Template.fromStack(stack);
   });
 
@@ -20,6 +20,10 @@ describe('Docker Stack', () => {
     const secretsResourcesKeys = Object.keys(secretsResources);
     expect(secretsResourcesKeys.length).toBeGreaterThan(0);
     expect(secretsResourcesKeys.length).toBeLessThanOrEqual(3);
+  });
+
+  it('should have s3 resource', () => {
+    template.hasResource('AWS::S3::Bucket', {});
   });
 
   // it('should have ECS Cluster resource', () => {
