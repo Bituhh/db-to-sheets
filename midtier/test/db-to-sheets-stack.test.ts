@@ -26,21 +26,21 @@ describe('DB To Sheets Stack', () => {
     template.hasResource('AWS::S3::Bucket', {});
   });
 
-  // it('should have ECS Cluster resource', () => {
-  //   template.hasResource('AWS::ECS::Cluster', {});
-  // });
-  //
-  // describe('ECS TaskDefinition', () => {
-  //   const ecsTaskDefinitionType = 'AWS::ECS::TaskDefinition';
-  //   it('should exist', () => {
-  //     template.hasResource(ecsTaskDefinitionType, {});
-  //   });
-  //
-  //   it('should have properties', () => {
-  //     template.hasResourceProperties('AWS::ECS::TaskDefinition', {
-  //       RequiresCompatibilities: ['FARGATE'],
-  //       ContainerDefinitions: [{}],
-  //     });
-  //   });
-  // });
+  it('should have ECS Cluster resource', () => {
+    template.hasResource('AWS::ECS::Cluster', {});
+  });
+
+  describe('ECS TaskDefinition', () => {
+    const ecsTaskDefinitionType = 'AWS::ECS::TaskDefinition';
+    it('should exist', () => {
+      template.hasResource(ecsTaskDefinitionType, {});
+    });
+
+    it('should have properties', () => {
+      template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+        RequiresCompatibilities: ['FARGATE'],
+        ContainerDefinitions: [{}],
+      });
+    });
+  });
 });
