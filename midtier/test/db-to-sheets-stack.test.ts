@@ -37,7 +37,7 @@ describe('DB To Sheets Stack', () => {
     });
 
     it('should have properties', () => {
-      template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+      template.hasResourceProperties(ecsTaskDefinitionType, {
         RequiresCompatibilities: ['FARGATE'],
         ContainerDefinitions: [{}],
       });
