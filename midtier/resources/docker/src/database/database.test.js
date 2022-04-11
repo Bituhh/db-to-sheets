@@ -57,7 +57,7 @@ describe('Database', () => {
     /**
      * @type {jest.spyOn}
      */
-    let callPostgresSpy;
+    let postgresSpy;
     /**
      * @type {jest.spyOn}
      */
@@ -65,9 +65,9 @@ describe('Database', () => {
 
     beforeEach(() => {
       database = new Database({});
-      callPostgresSpy = jest.spyOn(database, 'callPostgres')
+      postgresSpy = jest.spyOn(database, 'postgres')
         .mockImplementation(() => Promise.resolve());
-      callMysqlSpy = jest.spyOn(database, 'callMysql')
+      callMysqlSpy = jest.spyOn(database, 'mysql')
         .mockImplementation(() => Promise.resolve());
     });
 
@@ -93,36 +93,36 @@ describe('Database', () => {
       expect(Validate.object).toHaveBeenCalledWith(expected, 'args');
     });
 
-    it('should call only Database.callPostgres if connection config.engine is \'postgres\'', async () => {
+    it('should call only Database.postgres if connection config.engine is \'postgres\'', async () => {
       database.config.engine = DatabaseEngine.postgres;
 
       await database.process('stored_procedure', {});
 
-      expect(callPostgresSpy).toHaveBeenCalled();
+      expect(postgresSpy).toHaveBeenCalled();
       expect(callMysqlSpy).not.toHaveBeenCalled();
     });
 
-    it('should call Database.callPostgres with the same parameters as stored procedure', async () => {
+    it('should call Database.postgres with the same parameters as stored procedure', async () => {
       database.config.engine = DatabaseEngine.postgres;
 
       const procedureName = Math.random().toString(36).slice(2);
       const procedureArgs = {reportId: Math.ceil(Math.random() * 10)};
       await database.process(procedureName, procedureArgs);
 
-      expect(callPostgresSpy)
+      expect(postgresSpy)
         .toHaveBeenCalledWith(procedureName, procedureArgs);
     });
 
-    it('should call only Database.callMysql if connection config.engine is \'mysql\'', async () => {
+    it('should call only Database.mysql if connection config.engine is \'mysql\'', async () => {
       database.config.engine = DatabaseEngine.mysql;
 
       await database.process('stored_procedure', {});
 
       expect(callMysqlSpy).toHaveBeenCalled();
-      expect(callPostgresSpy).not.toHaveBeenCalled();
+      expect(postgresSpy).not.toHaveBeenCalled();
     });
 
-    it('should call Database.callMysql with the same parameters as stored procedure', async () => {
+    it('should call Database.mysql with the same parameters as stored procedure', async () => {
       database.config.engine = DatabaseEngine.mysql;
 
       const procedureName = Math.random().toString(36).slice(2);
@@ -139,12 +139,12 @@ describe('Database', () => {
         .rejects
         .toThrow('Unknown engine in connection configuration!');
       expect(callMysqlSpy).not.toHaveBeenCalled();
-      expect(callPostgresSpy).not.toHaveBeenCalled();
+      expect(postgresSpy).not.toHaveBeenCalled();
     });
 
-    it('should return value from callPostgres', async () => {
+    it('should return value from postgres', async () => {
       const expected = [{name: 'string'}];
-      jest.spyOn(database, 'callPostgres').mockReturnValue(expected);
+      jest.spyOn(database, 'postgres').mockReturnValue(expected);
 
       database.config.engine = DatabaseEngine.postgres;
       const result = await database.process('stored_procedure', {});
@@ -153,9 +153,9 @@ describe('Database', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return value from callMysql', async () => {
+    it('should return value from mysql', async () => {
       const expected = [{name: 'string'}];
-      const spy = jest.spyOn(database, 'callMysql')
+      const spy = jest.spyOn(database, 'mysql')
         .mockReturnValue(expected);
 
       database.config.engine = DatabaseEngine.mysql;
@@ -166,7 +166,7 @@ describe('Database', () => {
     });
   });
 
-  describe('callPostgres', () => {
+  describe('postgres', () => {
     /**
      * @type {Database}
      */

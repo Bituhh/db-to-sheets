@@ -63,8 +63,8 @@ describe('DBToSheets', () => {
       expect(spy).toHaveBeenCalledWith(reportId);
     });
 
-    it('should call getReportData', async () => {
-      const spy = jest.spyOn(dbToSheets, 'getReportData')
+    it('should call getDataToExport', async () => {
+      const spy = jest.spyOn(dbToSheets, 'getDataToExport')
         .mockImplementation(() => Promise.resolve());
 
       await dbToSheets.run(1);
@@ -72,7 +72,7 @@ describe('DBToSheets', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('should call getReportData with data returned from getReportDetails', async () => {
+    it('should call getDataToExport with data returned from getReportDetails', async () => {
       const expected = new ReportDetails({
         id: 1,
         name: 'Example Report',
@@ -83,7 +83,7 @@ describe('DBToSheets', () => {
       });
       jest.spyOn(dbToSheets, 'getReportDetails')
         .mockReturnValue(Promise.resolve(expected));
-      const getReportDataSpy = jest.spyOn(dbToSheets, 'getReportData')
+      const getReportDataSpy = jest.spyOn(dbToSheets, 'getDataToExport')
         .mockImplementation(() => Promise.resolve());
 
       await dbToSheets.run(1);
@@ -119,7 +119,7 @@ describe('DBToSheets', () => {
       });
       jest.spyOn(dbToSheets, 'getReportDetails')
         .mockReturnValue(Promise.resolve(reportDetails));
-      jest.spyOn(dbToSheets, 'getReportData')
+      jest.spyOn(dbToSheets, 'getDataToExport')
         .mockReturnValue(Promise.resolve(reportData));
 
       await dbToSheets.run(1);
@@ -199,7 +199,7 @@ describe('DBToSheets', () => {
     });
   });
 
-  describe('getReportData', () => {
+  describe('getDataToExport', () => {
 
     /**
      * @type {ReportDetails}
