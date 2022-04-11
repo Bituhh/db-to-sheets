@@ -17,7 +17,7 @@ class DBToSheets {
     if (!reportDetails) {
       throw new Error('No report could be found for the specified id!');
     }
-    const reportData = await this.getReportData(
+    const reportData = await this.getDataToExport(
       reportDetails.secretsManagerKey,
       reportDetails.storedProcedureName,
     );
@@ -48,7 +48,7 @@ class DBToSheets {
     });
   }
 
-  async getReportData(secretsManagerKey, storedProcedureName) {
+  async getDataToExport(secretsManagerKey, storedProcedureName) {
     Validate.string(secretsManagerKey, 'secretsManagerKey');
     Validate.string(storedProcedureName, 'storedProcedureName');
     return await DBToSheets.#getDataFromDatabase(

@@ -219,25 +219,25 @@ describe('DBToSheets', () => {
     });
 
     it('should exist', () => {
-      expect(dbToSheets.getReportData).toBeDefined();
+      expect(dbToSheets.getDataToExport).toBeDefined();
     });
 
     it('should call Validate.string for first argument', async () => {
-      await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
+      await dbToSheets.getDataToExport(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 
       expect(Validate.string)
         .toHaveBeenCalledWith(reportDetails.secretsManagerKey, 'secretsManagerKey');
     });
 
     it('should call Validate.string for second argument', async () => {
-      await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
+      await dbToSheets.getDataToExport(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 
       expect(Validate.string)
         .toHaveBeenCalledWith(reportDetails.storedProcedureName, 'storedProcedureName');
     });
 
     it('should call SecretManager.getSecret with the parameter that was passed', async () => {
-      await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
+      await dbToSheets.getDataToExport(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 
       expect(SecretManager.getSecret)
         .toHaveBeenCalledWith(reportDetails.secretsManagerKey);
@@ -256,13 +256,13 @@ describe('DBToSheets', () => {
       });
       SecretManager.getSecret.mockReturnValue(Promise.resolve(expected));
 
-      await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
+      await dbToSheets.getDataToExport(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 
       expect(Database).toHaveBeenCalledWith(expected);
     });
 
     it('should call database.storedProcedure with first argument as reportDetails.storedProcedureName and second as empty object', async () => {
-      await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
+      await dbToSheets.getDataToExport(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 
       expect(Database.prototype.process)
         .toHaveBeenCalledWith(reportDetails.storedProcedureName, {});
@@ -272,7 +272,7 @@ describe('DBToSheets', () => {
       const data = Random.table();
       Database.prototype.process.mockReturnValue(Promise.resolve(data));
 
-      const response = await dbToSheets.getReportData(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
+      const response = await dbToSheets.getDataToExport(reportDetails.secretsManagerKey, reportDetails.storedProcedureName);
 
       expect(response).toBe(data);
     });
