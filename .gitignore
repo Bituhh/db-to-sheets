@@ -1,2 +1,10 @@
+!midtier/jest.config.js
+midtier/*.d.ts
+midtier/**/node_modules
+!midtier/resources/layers/helpers/node_modules
+
+# CDK asset staging directory
+midtier/.cdk.staging
+midtier/cdk.out
 
 midtier/resources/docker/src/db-to-sheets-credentials.json
