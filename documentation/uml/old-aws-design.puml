@@ -1,0 +1,22 @@
+@startuml
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Containers/Fargate.puml
+
+actor User
+database Database
+FargateParticipant(Fargate, Expensive Instance, Running every 5 mins)
+
+User -> Database: Store report data
+loop every 5 min
+  Fargate -> Database: Do you have anytime for me to process at this time?
+  alt no
+    Database -> Fargate: Don't run anything
+  else yes
+    Database -> Fargate: Report to run
+    Fargate -> User: Export data
+  end
+end
+
+
+@enduml
