@@ -1,0 +1,36 @@
+@startuml
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/SecurityIdentityCompliance/SecretsManager.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+
+participant Start
+SecretsManagerParticipant(SecretsManager, AWS SecretsManager, Stores Database Credentials)
+database InternalDatabase
+database ExternalDatabase
+SimpleStorageServiceParticipant(S3, S3, Stores Google Credentials)
+entity GoogleSheetsAPI
+
+group 1. Retrieve report data
+  Start -> SecretsManager: Retrieve internal database credentials
+  SecretsManager -> Start: Credentials
+  Start -> InternalDatabase: Retrieve Report Data
+  Start <- InternalDatabase: Report Data
+end
+group 2. Retrieve export data
+  Start -> SecretsManager: Retrieve external database credentials
+  Start <- SecretsManager: Credentials
+  Start -> ExternalDatabase: Retrieve data to export
+  Start <- ExternalDatabase: Export data
+end
+
+group 3. Add data to spreadsheet
+  Start -> S3: Retrieve google credentials file
+  Start <- S3: Credentials File
+  Start -> GoogleSheetsAPI: Authenticate
+  Start <- GoogleSheetsAPI: Success
+  Start -> GoogleSheetsAPI: Write data to spreadsheet
+  Start <- GoogleSheetsAPI: Success
+end
+@enduml

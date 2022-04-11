@@ -1,0 +1,28 @@
+@startuml
+class Database {
+  +call(storedProcedureName: string);
+  -connect(ssmParameter: string);
+}
+
+class SecretManager {
+  +getSecret()
+}
+
+class Spreadsheet {
+  +convertToSpreadsheetFormat(object: {[key: string]: any}[]): (string|number|boolean)[][]
+  +writeToSpreadsheet(data);
+  -connect(ssmParameter: string)
+}
+
+class DBToSheets {
+  +run(reportId: number)
+}
+
+circle Run
+
+Run ..> DBToSheets
+DBToSheets ..> Database
+DBToSheets ..> SecretManager
+DBToSheets ..> Spreadsheet
+
+@enduml
